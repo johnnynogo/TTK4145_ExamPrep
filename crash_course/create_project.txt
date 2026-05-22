@@ -1,0 +1,4 @@
+Ctrl + Shift + P
+'Create Java Project'
+'No Build Tools'
+Save where you want to save
