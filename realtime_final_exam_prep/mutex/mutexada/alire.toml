@@ -1,5 +1,5 @@
-name = "mutex"
-description = "solving mutex problem from little book of semaphores"
+name = "mutexada"
+description = "mutex in ada"
 version = "0.1.0-dev"
 
 authors = ["Johnny Ngo Nguyen"]
@@ -7,6 +7,6 @@ maintainers = ["Johnny Ngo Nguyen <nguyenjohnnyngo@gmail.com>"]
 maintainers-logins = ["johnnynogo"]
 licenses = "MIT"
 website = ""
-tags = ["mutex", "ada", "semaphores", "realtime"]
+tags = ["mutex", "ada", "realtime"]
 
-executables = ["mutex"]
+executables = ["mutexada"]
