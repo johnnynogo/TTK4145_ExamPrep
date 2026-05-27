@@ -1,0 +1,12 @@
+name = "rendezvousada2"
+description = ""
+version = "0.1.0-dev"
+
+authors = ["Johnny Ngo Nguyen"]
+maintainers = ["Johnny Ngo Nguyen <nguyenjohnnyngo@gmail.com>"]
+maintainers-logins = ["johnnynogo"]
+licenses = "MIT"
+website = ""
+tags = []
+
+executables = ["rendezvousada2"]
