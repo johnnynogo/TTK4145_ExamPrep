@@ -1,0 +1,5 @@
+mupltiplex = Semaphore(n)
+
+multiplex.wait()
+    # critical section
+multiplex.signal()
