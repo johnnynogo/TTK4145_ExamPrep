@@ -1,0 +1,59 @@
+// faulty one, fast thread B can lap a slow thread A
+mutex = semaphore(1)
+barrier = semaphore(0)
+
+count = 0
+n = 5
+
+rendezvous()
+
+mutex.wait()
+    count += 1
+    if count == n:
+        barrier.signal()
+mutex.signal
+
+barrier.wait()
+barrier.signal()
+
+criticalPoint()
+
+mutex.wait()
+    count -= 1
+    if count == 0:
+        barrier.wait()
+mutex.signal()
+
+// We need a double turnstile solution to solve the problem of
+// a fast thread lapping a slow thread, let 'barrier' become 'turnstile'
+
+turnstile = Semaphore(0)
+turnstile2 = Semaphore(1)
+mutex = Semaphore(1)
+
+count = 0
+n = 3
+
+rendezvous()
+
+mutex.wait()
+    count++
+    if count == n:
+        turnstile.signal()
+        turnstile2.wait()
+mutex.signal()
+
+turnstile.wait()
+turnstile.signal()
+
+criticalPoint()
+
+mutex.wait()
+    count--
+    if count == 0
+        turnstile2.signal()
+        turnstile.wait()
+mutex.signal()
+
+turnstile2.wait()
+turnstile2.signal()
