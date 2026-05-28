@@ -1,0 +1,21 @@
+mutex = semaphore(1)
+barrier = semaphore(0)
+counter = 0
+
+rendezvous()        // the work before the barrier
+
+mutex.wait()
+    counter = counter + 1
+mutex.signal()
+
+if counter == n
+    barrier.signal()
+
+barrier.wait()         // all threads meet here
+barrier.signal()
+
+criticalPoint()
+
+// after all threads have passed, the barrier has value 1, this can cause problems for the second round
+// when a thread arrives for second round, it passes through the barrier, not waiting for the rest of threads.
+// reusable barrier solves these problems.

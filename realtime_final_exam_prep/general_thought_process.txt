@@ -1,0 +1,17 @@
+1. What is the constraint?
+   → "no thread proceeds until all have arrived"
+
+2. What shared state do I need to track it?
+   → a counter (count)
+
+3. What protects that shared state?
+   → a mutex semaphore
+
+4. What blocks threads until the constraint is met?
+   → a barrier semaphore initialised to 0
+
+5. Who unblocks everyone?
+   → the last thread to arrive (count == n)
+
+6. How does one signal release ALL waiting threads?
+   → turnstile: each woken thread re-signals for the next

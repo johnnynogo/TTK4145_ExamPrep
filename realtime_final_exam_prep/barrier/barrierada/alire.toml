@@ -1,0 +1,12 @@
+name = "barrierada"
+description = "barrier in ada"
+version = "0.1.0-dev"
+
+authors = ["Johnny Ngo Nguyen"]
+maintainers = ["Johnny Ngo Nguyen <nguyenjohnnyngo@gmail.com>"]
+maintainers-logins = ["johnnynogo"]
+licenses = "MIT"
+website = ""
+tags = ["barrier", "realtime", "semaphore"]
+
+executables = ["barrierada"]
