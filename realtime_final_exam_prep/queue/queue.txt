@@ -1,0 +1,167 @@
+// --------------------------------------------
+// first thought process
+// --------------------------------------------
+mutex = Semaphore(1)
+proceed = Semaphore(0)
+leader = false
+follower = false
+
+// leader
+mutex.wait()
+    if follower:
+        proceed.signal()
+    else:
+        proceed.wait()
+mutex.signal()
+
+// follower
+mutex.wait()
+    if leader:
+        proceed.signal()
+    else
+        proceed.wait()
+mutex.signal()
+
+// --------------------------------------------
+// but i think we want while loop instead of if:
+// --------------------------------------------
+
+mutex = Semaphore(1)
+proceed = Semaphore(0)
+leader = false
+follower = false
+
+// leader
+mutex.wait()
+    leader = true
+
+    while !follower:
+        proceed.wait()
+    
+    proceed.signal()
+mutex.signal()
+
+// follower
+mutex.wait()
+    follower = true
+
+    while !leader:
+        proceed.wait()
+
+    proceed.signal()
+mutex.signal()
+
+// --------------------------------------------
+// hint says two queues
+// --------------------------------------------
+
+mutex = Semaphore(1)
+leaderQueue = Semaphore(0)
+followerQueue = Semaphore(0)
+proceed = Semaphore(0)
+
+// leader
+mutex.wait()
+    leaderQueue.signal()
+
+    while !followerQueue:
+        proceed.wait()
+    
+    proceed.signal()
+mutex.signal()
+
+// follower
+mutex.wait()
+    followerQueue.signal()
+
+    while !leaderQueue:
+        proceed.wait()
+
+    proceed.signal()
+mutex.signal()
+
+// --------------------------------------------
+// solution
+// --------------------------------------------
+
+leaderQueue = Semaphore(0)
+followerQueue = Semaphore(0)
+
+// Leader:
+followerQueue.signal()    // signal that a follower is needed
+leaderQueue.wait()        // wait for a follower to arrive
+
+dance()
+
+// Follower:
+leaderQueue.signal()      // signal that a leader is needed
+followerQueue.wait()      // wait for a leader to arrive
+
+dance()
+
+// --------------------------------------------
+// Constraint: each leader can invoke dance concurrently with only one follower and v.v.
+// --------------------------------------------
+leaderQueue   = Semaphore(0)
+followerQueue = Semaphore(0)
+leaderReady   = Semaphore(0)   # leader signals ready to dance
+followerReady = Semaphore(0)   # follower signals ready to dance
+leaderDone    = Semaphore(0)   # leader signals done dancing
+followerDone  = Semaphore(0)   # follower signals done dancing
+
+# Leader:
+followerQueue.signal()
+leaderQueue.wait()
+leaderReady.signal()
+followerReady.wait()
+dance()
+leaderDone.signal()
+followerDone.wait()
+
+# Follower:
+leaderQueue.signal()
+followerQueue.wait()
+followerReady.signal()
+leaderReady.wait()
+dance()
+followerDone.signal()
+leaderDone.wait()
+
+
+// --------------------------------------------
+// Solution using scoreboard
+// --------------------------------------------
+
+mutex        = Semaphore(1)
+leaderQueue  = Semaphore(0)
+followerQueue = Semaphore(0)
+rendezvous   = Semaphore(0)
+leaders      = 0
+followers    = 0
+
+# Leader:
+mutex.wait()
+if followers > 0:
+    followers--
+    followerQueue.signal()    # wake a waiting follower
+else:
+    leaders++
+    mutex.signal()            # release mutex and wait
+    leaderQueue.wait()        # block until a follower arrives
+
+dance()
+rendezvous.wait()             # wait for partner to finish dance
+mutex.signal()                # NOW release the mutex
+
+# Follower (symmetric):
+mutex.wait()
+if leaders > 0:
+    leaders--
+    leaderQueue.signal()      # wake a waiting leader
+else:
+    followers++
+    mutex.signal()
+    followerQueue.wait()
+
+dance()
+rendezvous.signal()           # signal partner that dance is done
