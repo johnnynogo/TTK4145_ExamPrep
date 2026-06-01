@@ -1,0 +1,25 @@
+# Problem 5.3 in Burns & Wellings Real-Time Systems and Programming Languages
+
+mutex = Semaphore(1)
+emptyRoom = Semaphore(1)
+readers = 0
+
+# Reader
+mutex.wait()
+    readers++
+    if readers == 1
+        roomEmpty.wait()
+mutex.signal()
+
+read()
+
+mutex.wait()
+    readers--
+    if readers == 0
+        roomEmpty.signal()
+mutex.signal()
+
+# Writer
+emptyRoom.wait()
+    write()
+emptyRoom.signal()
