@@ -1,0 +1,21 @@
+mutex = Semaphore(1)
+items = Semaphore(0)
+spaces = Semaphore(buffer.size())
+local event
+
+// producer
+event = waitForEvent()
+spaces.wait()
+mutex.wait()
+    buffer.add(event)
+mutex.signal()
+items.signal()
+
+// consumer
+items.wait()
+mutex.wait()
+    event = buffer.get()
+mutex.signal()
+spaces.signal()
+
+event.process()
