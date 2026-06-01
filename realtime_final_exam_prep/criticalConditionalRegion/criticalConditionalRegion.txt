@@ -1,0 +1,20 @@
+mutex = Semaphore(1)
+waiting = 0
+condSem = Semaphore(0)
+
+# Entry protocol:
+mutex.wait()
+while not condition:
+    waiting++
+    mutex.signal()
+    condSem.wait()
+    mutex.wait()
+
+# Critical Section
+(...)
+
+# Exit protocol
+for i in range(waiting)
+    condSem.signal()
+waiting = 0
+mutex.signal()
