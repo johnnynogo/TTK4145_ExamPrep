@@ -1,0 +1,67 @@
+mutex = Semaphore(1)
+roomEmpty = Semaphore(1)
+int readers = 0
+
+// Writer
+roomEmpty.wait()
+    write()
+roomEmpty.signal()
+
+// Readers
+mutex.wait()
+    readers++
+    if readers == 1:
+        roomEmpty.wait()
+mutex.signal()
+
+read()
+
+mutex.lock()
+    readers--
+    if readers == 0
+        roomEmpty.signal()
+mutex.signal()
+
+
+// -------------------------
+// solution with lightswitch and without starvation
+// -------------------------
+readSwitch = Lightswitch()
+roomEmpty = Semaphore(1)
+turnstile = Semaphore(1)
+
+// Writer
+turnstile.wait()
+    roomEmpty.wait()
+        write()
+    roomEmpty.signal()
+turnstile.signal()
+
+// Readers
+turnstile.wait()
+turnstile.signal()
+readLightswitch.lock(roomEmpty)
+    read()
+readLightswitch.unlock(roomEmpty)
+
+// -------------------------
+// solution with lightswitch and without starvation and with priority to writers
+// -------------------------
+readSwitch = Lightswitch()
+writeSwitch = Lightswitch()
+noReaders = Semaphore(1)
+noWriters = Semaphore(1)
+
+// Writer
+writeSwitch.lock(noReaders)
+    noWriters.wait()
+        write()
+    noWriters.signal()
+writeSwitch.unlock(noReaders)
+
+// Reader
+noReaders.wait()
+    readSwitch.lock(noWriters)
+noReaders.signal()
+read()
+readSwitch.unlock(noWriters)
