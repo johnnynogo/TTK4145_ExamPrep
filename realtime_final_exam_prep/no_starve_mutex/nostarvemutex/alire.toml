@@ -1,0 +1,12 @@
+name = "nostarvemutex"
+description = "no starve mutex in ada"
+version = "0.1.0-dev"
+
+authors = ["Johnny Ngo Nguyen"]
+maintainers = ["Johnny Ngo Nguyen <nguyenjohnnyngo@gmail.com>"]
+maintainers-logins = ["johnnynogo"]
+licenses = "MIT"
+website = "github.com/johnnynogo"
+tags = ["nostarvemutex"]
+
+executables = ["nostarvemutex"]
