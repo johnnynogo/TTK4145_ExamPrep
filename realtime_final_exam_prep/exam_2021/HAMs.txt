@@ -1,0 +1,53 @@
+HAM[25]     = [Semaphore(1), ..., Semaphore(1)]
+allocMutex  = Semaphore(1)
+hamFreed    = Semaphore(0)    -- signals when HAMs are released
+
+allocate(list):
+    while True:
+        allocMutex.wait()
+        if allFree(list):               -- check if all HAMs in list are free
+            for each h in list:
+                HAM[h].wait()           -- acquire all HAMs atomically
+            allocMutex.signal()
+            return                      -- success, exit loop
+        else:
+            allocMutex.signal()         -- release mutex
+            hamFreed.wait()             -- block until someone frees HAMs
+
+free(list):
+    for each h in list:
+        HAM[h].signal()                 -- release all HAMs
+    hamFreed.signal()                   -- wake up waiting allocators
+
+allFree(list):
+    for each h in list:
+        if HAM[h] == 0: return False    -- this HAM is busy
+    return True                         -- all HAMs are free
+
+// Sverre's solution
+HAM[25] = [Semaphore(1), ..., Semaphore(1)]
+allocMutex = Semaphore(1)
+
+allocate(HAM_list) {
+    allocMutex.wait()
+    if (lm_resourcesAreFree(resourceList)) {
+        lm_reserve(resourceList);
+        allocMutex.signal(); return;
+    } else {
+        qn = allocateQueueNumber();
+        store_request(qn, rList);
+        allocMutex.signal()
+        HAM.wait()
+    }
+}
+
+free(HAM_list) {
+    allocMutex.wait()
+    lm_unreserve(rList);
+    while(any requests fulfillable) {
+        set qn & rl for fulfillable requests
+        lm_reserve(rList);
+        HAM.signal()
+    }
+    allocMutex.signal()
+}
