@@ -1,0 +1,58 @@
+semOkToRun = Semaphore(0);
+semOkToInit = Semaphore(0);
+int running = 0;
+mutexRunning = Semaphore (1);
+mutexErrorDetected = Semaphore(1);
+
+t1 {
+
+}
+
+t2 {
+
+}
+
+initDone     = Semaphore(0)   -- threads wait here for init
+allStopped   = Semaphore(0)   -- t1 waits here until all threads stopped
+mutex        = Semaphore(1)   -- protects shared variables
+reinitNeeded = False
+runningCount = N - 1          -- number of worker threads (t2 to tn)
+
+# t1 (initializer/reinitializer):
+doInitialization()
+initDone.signal()             -- start turnstile, release all threads
+
+# when error occurs, t1 calls reinit():
+reinit():
+    mutex.wait()
+        reinitNeeded = True
+    mutex.signal()
+
+    allStopped.wait()         -- wait until all threads have stopped
+
+    doInitialization()        -- safe to reinitialize now
+
+    mutex.wait()
+        reinitNeeded = False
+        runningCount = N - 1  -- reset count
+    mutex.signal()
+
+    initDone.signal()         -- release turnstile again
+
+# t2 to tn (worker threads):
+# startup:
+initDone.wait()               -- wait for initial initialization
+initDone.signal()             -- turnstile
+
+# periodically check if reinit needed:
+checkReinit():
+    mutex.wait()
+        if reinitNeeded:
+            runningCount--
+            if runningCount == 0:
+                allStopped.signal()   -- last thread signals t1
+            mutex.signal()
+            initDone.wait()           -- block until reinitialized
+            initDone.signal()         -- turnstile
+        else:
+            mutex.signal()

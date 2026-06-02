@@ -1,0 +1,33 @@
+// Problem is based on code below
+
+//Globals:
+bool g_initDone = False;
+
+//Threads:
+t1(){
+    // Do initialization
+    g_initDone = True;
+    resume(t2)
+    // Continue executing
+}
+
+t2(){
+    if(g_initDone == False){
+        suspend();
+    }
+    // Continue executing
+}
+
+// with semaphores does that include lightswitch on that first one?
+// Solved with semaphores with unknown number of threads
+
+initDone = Semaphore(0)
+
+# t1 (initializer):
+doInitialization()
+initDone.signal()
+
+# t2 to tn (every other thread):
+initDone.wait()
+initDone.signal()
+continueExecuting()

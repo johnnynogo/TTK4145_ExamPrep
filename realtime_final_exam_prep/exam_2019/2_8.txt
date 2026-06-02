@@ -1,0 +1,84 @@
+protected SafeThreadInit is
+    entry WaitForInit;        -- all threads wait here at startup and reinit
+    procedure ThreadDone;     -- thread signals it has stopped
+    procedure DetectError;    -- called when error is detected
+    procedure Initialize;     -- t1 calls this after reinit
+    entry WaitAllStopped;     -- t1 waits here until all threads stopped
+private
+    Running       : Natural := 0;
+    TotalThreads  : constant Natural := N;
+    InitDone      : Boolean := False;
+    ReinitNeeded  : Boolean := False;
+    AllStopped    : Boolean := False;
+end SafeThreadInit;
+
+protected body SafeThreadInit is
+
+    -- threads wait here until initialization is done
+    entry WaitForInit when InitDone and not ReinitNeeded is
+    begin
+        Running := Running + 1;
+    end WaitForInit;
+
+    -- called periodically by each thread to check if reinit needed
+    procedure ThreadDone is
+    begin
+        Running := Running - 1;
+        if Running = 0 then
+            AllStopped := True;    -- last thread signals t1
+        end if;
+    end ThreadDone;
+
+    -- any thread calls this when it detects an error
+    procedure DetectError is
+    begin
+        if not ReinitNeeded then
+            ReinitNeeded := True;
+            InitDone     := False; -- close the door
+        end if;
+    end DetectError;
+
+    -- t1 waits here until all threads have stopped
+    entry WaitAllStopped when AllStopped is
+    begin
+        AllStopped := False;   -- reset for next time
+    end WaitAllStopped;
+
+    -- t1 calls this after reinitializing
+    procedure Initialize is
+    begin
+        ReinitNeeded := False;
+        InitDone     := True;   -- reopen the door
+        Running      := 0;
+    end Initialize;
+
+end SafeThreadInit;
+
+-- Sverre's solution
+protected object body begin
+    Bool error = True   // Bad form, but setting this to true at startup
+                        // gives the startup initialization
+    int nOfThreads = 0  // Heh, thread 1 is not counted.
+    
+    // Called by t2-tn at thread startup
+    entry threadStart when not error begin
+        nOfThreads++
+    end
+    
+    // Called at regular intervals by all threads except t1.
+    entry allOK() when not error begin end
+    
+    // Called by any thread that detects an error
+    procedure forceReinitialization()
+    begin
+        error = True
+    end
+    
+    // Called by t1 at regular intervals by t1
+    procedure t1AllOK() when (error and allOK’Count == nOfThreads) or (not error)
+    begin
+    if(error){
+        init()
+        error = False
+    }
+    end
