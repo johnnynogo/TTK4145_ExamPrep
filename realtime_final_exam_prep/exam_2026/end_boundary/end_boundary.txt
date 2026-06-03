@@ -1,0 +1,76 @@
+// Any shared variables?
+clientSem    = Semaphore(0)
+role1Sem = Semaphore(0)
+role2Sem = Semaphore(0)
+role3Sem = Semaphore(0)
+mutex        = Semaphore(1)
+barrier      = Semaphore(0)
+finished     = 0
+errorMutex   = Semaphore(1)
+errorDetected = False
+
+// Called by client
+bool doAction(){
+    mutex.wait()
+        finished = 0
+        errorDetected = false
+    mutex.signal()
+
+    // Get the three threads started
+    role1Sem.signal()
+    role2Sem.signal()
+    role3Sem.signal()
+
+    // Wait until all have finished
+    clientSem.wait()
+
+    return not errorDetected
+
+    // Collect the success or fail result
+    return result;
+}
+
+bool checkError():
+    errorMutex.wait()
+        result = errorDetected
+    errorMutex.signal()
+    return result
+
+void reportError():
+    errorMutex.wait()
+        errorDetected = True
+    errorMutex.signal()
+
+void endBarrier():
+    mutex.wait()
+        finished++
+        if finished == 3:
+            clientSem.signal()    -- last one signals client
+            mutex.signal()
+            barrier.signal()      -- start turnstile
+        else:
+            mutex.signal()
+    barrier.wait()                -- wait for all to finish
+    barrier.signal()              -- turnstile
+
+// role1..role3 is called by each of the three threads
+void role1(){
+    while True:
+    role1Sem.wait()           -- wait for client to start action
+
+    -- do work, periodically check for errors
+    doWork1():
+        -- periodically call:
+        if checkError(): break    -- stop work if error detected
+
+    -- if we detected the error ourselves:
+    if weDetectedError:
+        reportError()
+
+    -- error handling if needed:
+    if checkError():
+        doErrorHandling1()
+
+    -- arrive at end barrier
+    endBarrier()
+}
