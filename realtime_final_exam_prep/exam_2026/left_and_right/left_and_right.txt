@@ -1,0 +1,18 @@
+RightSem = Semaphore(1)
+LeftSem = Semaphore(1)
+RightFinished = Semaphore(0)
+LeftFinished = Semaphore(0)
+
+// Right
+RightSem.wait()
+    R()
+    RightFinished.signal()
+    LeftFinished.wait()
+RightSem.signal()
+
+// Left
+LeftSem.wait()
+    L()
+    LeftFinished.signal()
+    RightFinished.wait()
+LeftSem.signal()
