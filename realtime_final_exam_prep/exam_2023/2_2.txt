@@ -1,0 +1,58 @@
+//---------------------------------------------
+// Entry protocol, exit is in 2_3.txt
+//---------------------------------------------
+
+// Whatever semaphores, functions, threads, variables etc. are necessary
+Semaphore mutex(1);
+Semaphore coordinatorNeeded(0);
+Semaphore capacity(0);
+int workers = 0;
+
+void workerEntry() {
+    wait(mutex);
+        workers++;
+        if (workers % 3 == 1)
+            signal(coordinatorNeeded);
+    signal(mutex);
+    wait(capacity);
+}
+
+void coordinatorEntry() {
+    wait(coordinatorNeeded);
+    signal(capacity);
+    signal(capacity);
+    signal(capacity);
+}
+
+//---------------------------------------------
+// Sverre's solution from 2_1 that did not work
+//---------------------------------------------
+
+Semaphore mutex(1);
+Semaphore coordinatorNeeded(0);
+Semaphore capacity(0);
+int waitingWorkers = 0;
+
+void workerEntry(){
+    wait(mutex);
+        waitingWorkers++;
+        if(waitingWorkers == 1) signal(coordinatorNeeded)
+    signal(mutex);
+    wait(capacity);
+    wait(mutex);waitingWorkers--;signal(mutex);
+}
+
+void coordinatorEntry(){
+    wait(mutex);
+    if(waitingWorkers>0){
+        // They need me!
+        signal(capacity);
+        signal(capacity);
+        signal(capacity);
+        signal(mutex);
+    }else{
+        // They did not need me, signal the mutex and wait.
+        signal(mutex);
+        wait(coordinatorNeeded);
+    }
+}
