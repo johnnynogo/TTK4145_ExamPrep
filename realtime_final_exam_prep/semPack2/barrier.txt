@@ -1,0 +1,21 @@
+T1 = Semaphore(0)
+T2 = Semaphore(0)
+T3 = Semaphore(0)
+
+// Thread 1
+T2.signal()
+T3.signal()
+T1.wait()
+T1.wait()
+
+// Thread 2
+T1.signal()
+T3.signal()
+T2.wait()
+T2.wait()
+
+// Thread 3
+T1.signal()
+T2.signal()
+T3.wait()
+T3.wait()
