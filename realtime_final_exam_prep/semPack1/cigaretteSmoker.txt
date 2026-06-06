@@ -1,0 +1,26 @@
+isTobacco = isPaper = isMatch = False
+agentSem = Semaphore(1)
+tobacco = Semaphore(0)
+paper = Semaphore(0)
+match = Semaphore(0)
+tobaccoSem = Semaphore(0)
+paperSem = Semaphore(0)
+matchSem = Semaphore(0)
+
+// tobacco
+tobacco.wait()
+mutex.wait()
+    if isPaper:
+        isPaper = False
+        matchSem.signal()
+    elif isMatch
+        isMatch = False
+        paperSem.signal()
+    else
+        isTobacco = True
+mutex.signal
+
+tobaccoSem.wait()
+makeCigarette()
+agentSem.signal()
+smoke()

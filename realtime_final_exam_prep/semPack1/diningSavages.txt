@@ -1,0 +1,19 @@
+servings = 0
+mutex = Semaphore(1)
+emptyPot = Semaphore(0)
+fullPot = Semaphore(0)
+
+// Cook
+emptyPot.wait()
+    //refill
+fullPot.signal()
+
+// Savages
+mutex.wait()
+    if(servings==0) 
+        emptyPot.signal()
+        fullPot.wait()
+        servings = M
+    servings--
+    getServingfromPot()
+mutex.signal()
